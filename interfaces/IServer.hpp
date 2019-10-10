@@ -5,6 +5,10 @@
 #pragma once
 
 namespace GuessGame {
+
+    /// \brief
+    enum e_code {SUCCESS, FAILED, SIGNAL};
+
     class IServer {
     public:
         /// \brief virtual destructor
@@ -12,5 +16,6 @@ namespace GuessGame {
 
         /// \brief runs the server
         virtual void run() = 0;
+        virtual int stop(e_code code) const = 0;
     };
 }
