@@ -7,7 +7,7 @@
 namespace GuessGame {
 
     /// \brief
-    enum e_code {INACTIVE = 0,
+    enum e_code {IS_INACTIVE = 0,
                  IS_RUNNING = 1,
                  STOP_SUCCESS = -1,
                  STOP_FAILED = -2,

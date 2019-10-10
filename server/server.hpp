@@ -28,7 +28,7 @@ namespace GuessGame {
         /// \brief server status
         /// Gets the status of the server
         /// \return the status code of the server
-        int getStatus() const {return _status};
+        int getStatus() const override {return _status;};
 
 
         // Server methods

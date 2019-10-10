@@ -9,7 +9,11 @@
 int main(int ac, const char * const *av)
 {
     try {
-        std::unique_ptr<GuessGame::IServer> server = (new GuessGame::Server);
+        std::unique_ptr<GuessGame::IServer> server(new GuessGame::Server(ac, av));
+        server->run();
+        while (server->getStatus() == GuessGame::IS_RUNNING) {
+            std::cout << "Server running ..." << std::endl;
+        }
         std::cout << "Server main." << std::endl;
     } catch (Log::Exception &exception) {
         exception.debugErrorMessage();
