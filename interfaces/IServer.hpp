@@ -7,7 +7,11 @@
 namespace GuessGame {
 
     /// \brief
-    enum e_code {SUCCESS, FAILED, SIGNAL};
+    enum e_code {INACTIVE = 0,
+                 IS_RUNNING = 1,
+                 STOP_SUCCESS = -1,
+                 STOP_FAILED = -2,
+                 STOP_SIGNAL = -3};
 
     class IServer {
     public:
@@ -16,6 +20,7 @@ namespace GuessGame {
 
         /// \brief runs the server
         virtual void run() = 0;
-        virtual int stop(e_code code) const = 0;
+        virtual int stop() = 0;
+        virtual int getStatus() const = 0;
     };
 }

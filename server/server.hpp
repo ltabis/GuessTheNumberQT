@@ -17,18 +17,24 @@ namespace GuessGame {
         /// \param limit limit of turn for the player
         Server(unsigned int bound_x, unsigned int bound_y, unsigned int limit);
         Server(const std::pair<unsigned int, unsigned int> &bounds, unsigned int limit);
+        Server(int ac, const char * const *av);
 
         // Inheritance methods
         /// \brief runs the server
         void run() override;
         /// \brief stops the server
-        /// \param code stop code
         /// \return the code that made the server stop
-        int stop(e_code code) const override {return code;};
+        int stop() override;
+        /// \brief server status
+        /// Gets the status of the server
+        /// \return the status code of the server
+        int getStatus() const {return _status};
+
 
         // Server methods
     private:
         std::pair<unsigned int, unsigned int> _bounds;
         unsigned int _limit;
+        e_code _status;
     };
 }
