@@ -1,5 +1,5 @@
 # Prerequisites
-*.d
+65;5602;1c*.d
 
 # Compiled Object files
 *.slo
@@ -36,3 +36,4 @@ cmake-build-debug/
 client
 server
 build
+subject
