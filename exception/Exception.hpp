@@ -17,7 +17,7 @@ namespace Log {
         Exception(const char *what, const char *where);
         ~Exception() override;
 
-        void debugErrorMessage();
+        void debugErrorMessage() const;
 
     private:
         std::string _what;

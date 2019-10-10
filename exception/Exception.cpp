@@ -6,7 +6,7 @@
 
 Log::Exception::~Exception() = default;
 
-void Log::Exception::debugErrorMessage()
+void Log::Exception::debugErrorMessage() const
 {
     std::cerr << RED << "[Exception] " << MAGENTA << _what << WHITE << " in method " << BLUE << _where << std::endl;
 }
