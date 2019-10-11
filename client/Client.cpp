@@ -31,5 +31,4 @@ void GuessGame::Client::onTextMessageReceived(QString message)
 {
     if (_debug)
         qDebug() << "[Client] Message received:" << message;
-    _webSocket.close();
 }
