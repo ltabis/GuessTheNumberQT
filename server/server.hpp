@@ -14,6 +14,12 @@
 
 #include "IServer.hpp"
 
+QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
+QT_FORWARD_DECLARE_CLASS(QWebSocket)
+
+#define DEFAULT_DEBUG   false
+#define DEFAULT_PORT    4242
+
 namespace GuessGame {
     class Server : public QObject, public IServer {
     Q_OBJECT
@@ -22,10 +28,11 @@ namespace GuessGame {
         /// \param bound_x minimum bound value
         /// \param bound_y maximum bound value
         /// \param limit limit of turn for the player
-        Server(unsigned int bound_x, unsigned int bound_y, unsigned int limit);
-        Server(const std::pair<unsigned int, unsigned int> &bounds, unsigned int limit);
-        Server(int ac, const char * const *av);
-        Server(quint16 port, bool debug = false, QObject *parent = nullptr);
+//        Server(unsigned int bound_x, unsigned int bound_y, unsigned int limit);
+//        Server(const std::pair<unsigned int, unsigned int> &bounds, unsigned int limit);
+//        Server(int ac, const char * const *av);
+        Server(quint16 port, bool debug = false, QObject *parent = nullptr, std::pair<unsigned int, unsigned int > bounds = std::make_pair(1, 100));
+        ~Server();
 
         // Inheritance methods
         /// \brief runs the server
@@ -49,11 +56,14 @@ namespace GuessGame {
 
         // Server methods
     private:
+        QWebSocketServer *_pWebSocketServer;
+        QList<QWebSocket *> _clients;
+        QCommandLineParser _appParser;
+
         std::pair<unsigned int, unsigned int> _bounds;
         unsigned int _limit;
         e_code _status;
-        QWebSocketServer *_pWebSocketServer;
-        QList<QWebSocket *> _clients;
+        // to replace with debug object
         bool _debug;
     };
 }
