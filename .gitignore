@@ -33,7 +33,6 @@
 
 .idea/
 cmake-build-debug/
-client
 server
 build
 subject
