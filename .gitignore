@@ -1,5 +1,5 @@
 # Prerequisites
-65;5602;1c*.d
+*.d
 
 # Compiled Object files
 *.slo
@@ -37,3 +37,6 @@ client
 server
 build
 subject
+client_qt
+CMakeLists.txt.user
+unit_tests
