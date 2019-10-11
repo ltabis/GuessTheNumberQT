@@ -5,6 +5,14 @@ set(CMAKE_CXX_STANDARD 14)
 ## Setting exceptions path
 set(SRC_EXCEPTION ${CMAKE_CURRENT_SOURCE_DIR}/exception/Exception.cpp)
 
+## Adding options to debug with valgrind
+if (MSVC)
+    add_compile_options(/W4 /WX)
+else()
+    add_compile_options(-g)
+endif()
+
+## Getting Google test library
 set(CMAKE_PREFIX_PATH /usr/lib/x86_64-linux-gnu/qt5)
 enable_testing()
 find_package(GTest REQUIRED)
@@ -56,4 +64,5 @@ target_link_libraries(server PUBLIC
 target_link_libraries(client PUBLIC
         Qt5::Core
         Qt5::Gui
-        Qt5::Widgets)
+        Qt5::Widgets
+        Qt5::WebSockets)

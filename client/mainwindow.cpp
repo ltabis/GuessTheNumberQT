@@ -14,6 +14,7 @@ MainWindow::~MainWindow()
     delete _ui;
 }
 
+// Open up a socket to send the data
 void MainWindow::on_sendButton_clicked()
 {
     _ui->label->setText(QCoreApplication::translate("MainWindow", "button clicked", nullptr));

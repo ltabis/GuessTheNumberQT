@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
+#include <QtWebSockets/QWebSocket>
 
 namespace Ui {
     class MainWindow;
@@ -19,4 +20,5 @@ private slots:
 
 private:
     Ui::MainWindow *_ui;
+    QWebSocket _webSocket;
 };
