@@ -5,6 +5,7 @@
 #pragma once
 
 #include <utility>
+#include <QtWebSockets>
 
 #include "IServer.hpp"
 
