@@ -35,7 +35,6 @@ int main(int ac, char *av[])
         server->run();
         if (debug)
             std::cout << "Waiting for a connection ..." << std::endl;
-        while (server->getStatus() == GuessGame::IS_RUNNING);
         return app.exec();
     } catch (Log::Exception &exception) {
         exception.debugErrorMessage();
