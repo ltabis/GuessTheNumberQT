@@ -2,18 +2,31 @@
 // Created by tabis on 10/10/2019.
 //
 
+#include "Client.hpp"
 #include "Exception.hpp"
 #include "mainwindow.h"
 #include <QApplication>
 
 int main(int argc, char **argv)
 {
-    try {
-        QApplication a(argc, argv);
-        MainWindow w;
-        w.show();
+    QCoreApplication a(argc, argv);
 
-        return a.exec();
+    QCommandLineParser parser;
+    parser.setApplicationDescription("GuessTheNumber Client");
+    parser.addHelpOption();
+
+    QCommandLineOption dbgOption(QStringList() << "d" << "debug",{"Debug output [default: off]."});
+    parser.addOption(dbgOption);
+    parser.process(a);
+
+    bool debug = parser.isSet(dbgOption);
+
+    try {
+        GuessGame::Client client(QUrl(QStringLiteral("ws://localhost:4242")), debug);
+        QObject::connect(&client, &GuessGame::Client::closed, &a, &QCoreApplication::quit);
+        QCoreApplication app(argc, argv);
+
+        return app.exec();
     } catch (Log::Exception &exception) {
         exception.debugErrorMessage();
     }

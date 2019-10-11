@@ -45,7 +45,8 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ../client/)
 add_executable(client
         ${SRC_EXCEPTION}
         client/main_client.cpp
-        client/mainwindow.cpp)
+        client/mainwindow.cpp
+        client/Client.cpp)
 
 ## Tests
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ../tests)
