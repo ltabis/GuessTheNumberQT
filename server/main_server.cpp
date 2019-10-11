@@ -4,7 +4,7 @@
 
 #include <memory>
 #include "Exception.hpp"
-#include "server.hpp"
+#include "Server.hpp"
 
 int main(int ac, char *av[])
 {

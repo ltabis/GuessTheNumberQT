@@ -38,7 +38,7 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ../server/)
 add_executable(server
         ${SRC_EXCEPTION}
         server/main_server.cpp
-        server/server.cpp)
+        server/Server.cpp)
 
 ## Client
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ../client/)
