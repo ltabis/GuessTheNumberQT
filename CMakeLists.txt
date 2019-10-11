@@ -22,7 +22,8 @@ include_directories(${GTEST_INCLUDE_DIRS}
                     client
                     server
                     exception
-                    client_qt/client)
+                    client_qt/client
+                    build/client_autogen/include)
 
 ## Server
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ../server/)
