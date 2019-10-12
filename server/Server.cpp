@@ -17,8 +17,11 @@ _debug(DEFAULT_DEBUG)
 {
     setupServerApp(app);
     if (_pWebSocketServer->listen(QHostAddress::Any, DEFAULT_PORT)) {
-        if (_debug)
+        _playersConfig = _packetCreator.getJSONFromFile(DEFAULT_CONFIG_FILE);
+        if (_debug) {
             qDebug() << "[Server] Socket has been setuped correctly.";
+            qDebug() << "[Server] Player history loaded : " << _playersConfig;
+        }
         connect(_pWebSocketServer, &QWebSocketServer::newConnection,this, &Server::onNewConnection);
         connect(_pWebSocketServer, &QWebSocketServer::closed, this, &Server::closed);
     } else
@@ -153,7 +156,8 @@ void GuessGame::Server::handleGames(const QJsonObject &data, QWebSocket *pClient
         std::string format("Welcome to the game ! Guess the number between " +
         std::to_string(_bounds.first) + " and " + std::to_string(_bounds.second) + ". It is your turn, you have " +
         (_limit ? std::to_string(_limit) + " tries left." : " unlimited tries."));
-        QByteArray message = _packetCreator.createJSONPacket(QList<QList<std::string>>({{INFO_MESSAGE, format}, {TURN_MESSAGE, "yes"}}));
+        QByteArray message = _packetCreator.createJSONPacket(
+        QList<QList<std::string>>({{INFO_MESSAGE, format}, {TURN_MESSAGE, "yes"}}));
         pClient->sendBinaryMessage(message);
     } else
         checkIfWin(data, pClient);
@@ -165,12 +169,12 @@ void GuessGame::Server::handleGames(const QJsonObject &data, QWebSocket *pClient
 void GuessGame::Server::socketDisconnected()
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-    unsigned int clientIdx = _clients.indexOf(pClient);
+    int clientIdx = _clients.indexOf(pClient);
 
     if (_debug)
         qDebug() << "[Server] socket disconnected :" << pClient;
-    if (pClient)
-        deletePlayer(clientIdx, pClient);
+    if (pClient && clientIdx >= 0)
+        deletePlayer(clientIdx, pClient, 0);
 }
 
 void GuessGame::Server::checkIfWin(const QJsonObject &data, QWebSocket *pClient)
@@ -178,17 +182,19 @@ void GuessGame::Server::checkIfWin(const QJsonObject &data, QWebSocket *pClient)
     unsigned int clientIdx = _clients.indexOf(pClient);
 
     if (!_manager.getPlayerTriesLeftAtIndex(clientIdx) && _limit) {
-        QByteArray message = _packetCreator.createJSONPacket(QList<QList<std::string>>({{INFO_MESSAGE, "You've lost... The number was " +
+        QByteArray message = _packetCreator.createJSONPacket(QList<QList<std::string>>(
+        {{INFO_MESSAGE, "You've lost... The number was " +
         std::to_string(_manager.getPlayerNumberToFindAtIndex(clientIdx)) + "."}, {TURN_MESSAGE, "no"}}));
         pClient->sendBinaryMessage(message);
-        deletePlayer(clientIdx, pClient);
+        deletePlayer(clientIdx, pClient, 1);
     } else if (data[ANSWER_MESSAGE].toArray()[0].toString().toInt() == _manager.getPlayerNumberToFindAtIndex(clientIdx)) {
-        QByteArray message = _packetCreator.createJSONPacket(QList<QList<std::string>>({{INFO_MESSAGE, "You've won! The number was indeed " +
+        QByteArray message = _packetCreator.createJSONPacket(QList<QList<std::string>>(
+        {{INFO_MESSAGE, "You've won! The number was indeed " +
         std::to_string(_manager.getPlayerNumberToFindAtIndex(clientIdx)) + "."}, {TURN_MESSAGE, END_MESSAGE}}));
         if (_manager.getPlayerNameAtIndex(clientIdx) != DEFAULT_CLIENT_NAME)
             std::cout << "Congrats !" << std::endl;
         pClient->sendBinaryMessage(message);
-        deletePlayer(clientIdx, pClient);
+        deletePlayer(clientIdx, pClient, 2);
     } else
         checkDistance(data, pClient, clientIdx);
 }
@@ -209,8 +215,17 @@ void GuessGame::Server::checkDistance(const QJsonObject &data, QWebSocket *pClie
     _manager.subTriesOfPlayerAtIndex(clientIdx);
 }
 
-void GuessGame::Server::deletePlayer(unsigned int clientIdx, QWebSocket *pClient)
+void GuessGame::Server::deletePlayer(unsigned int clientIdx, QWebSocket *pClient, int status)
 {
+    if (_manager.getPlayerNameAtIndex(clientIdx) != DEFAULT_CLIENT_NAME) {
+        QJsonObject playerConfig =_packetCreator.createPlayerConfig(_manager.getPlayerNameAtIndex(clientIdx),
+                                          _manager.getPlayerTriesLeftAtIndex(clientIdx),
+                                          status,
+                                          _bounds,
+                                          _manager.getPlayerDateAtIndex(clientIdx));
+        _playersConfig.push_back(playerConfig);
+    }
+    _packetCreator.writeJSONToFile(DEFAULT_CONFIG_FILE, _playersConfig);
     _manager.deletePlayerAtIndex(clientIdx);
     _clients.removeAll(pClient);
     pClient->deleteLater();
