@@ -88,7 +88,7 @@ void GuessGame::Server::assignParametersToClient()
         _bounds.first = list.size() == 2 ? list.at(0).toInt() : DEFAULT_BOUNDX;
         _bounds.second = list.size() == 2 ? list.at(1).toInt() : DEFAULT_BOUNDY;
     }
-    _limit = limit > 0 ? _limit : limit;
+    _limit = limit > 0 ? limit : _limit;
     if (_bounds.first >= _bounds.second || _bounds.first <= 0 || _bounds.second <= 0 || (list.size() != 2 && !list.empty()))
         throw Log::Exception("Bad formatted bounds", "setupServerApp");
     if (_debug) {
@@ -112,7 +112,7 @@ void GuessGame::Server::onNewConnection()
     QByteArray obj = _packetCreator.createJSONPacket(QList<QList<std::string>>({{CONFIRM_CONNECTION, "Ok"}, {TURN_MESSAGE, "no"}}));
     if (_debug) {
         qDebug() << "[Server] A new client as just connected !";
-        qDebug() << "[Server] sending confirmed connection" << obj;
+        qDebug() << "[Server] sending confirmed connection.";
     }
     pSocket->sendBinaryMessage(obj);
 }
@@ -151,7 +151,7 @@ void GuessGame::Server::handleGames(const QJsonObject &data, QWebSocket *pClient
 {
     if (startOfGame) {
         std::string format("Welcome to the game ! Guess the number between " +
-        std::to_string(_bounds.first) + " and " + std::to_string(_bounds.second) + ". It is your turn, you have" +
+        std::to_string(_bounds.first) + " and " + std::to_string(_bounds.second) + ". It is your turn, you have " +
         (_limit ? std::to_string(_limit) + " tries left." : " unlimited tries."));
         QByteArray message = _packetCreator.createJSONPacket(QList<QList<std::string>>({{INFO_MESSAGE, format}, {TURN_MESSAGE, "yes"}}));
         pClient->sendBinaryMessage(message);
@@ -183,32 +183,37 @@ void GuessGame::Server::checkIfWin(const QJsonObject &data, QWebSocket *pClient)
         QByteArray message = _packetCreator.createJSONPacket(QList<QList<std::string>>({{INFO_MESSAGE, "You've lost... The number was " +
         std::to_string(_manager.getPlayerNumberToFindAtIndex(clientIdx)) + "."}, {TURN_MESSAGE, "no"}}));
         pClient->sendBinaryMessage(message);
-        _clients.removeAll(pClient);
-        pClient->deleteLater();
+        deletePlayer(clientIdx, pClient);
     } else if (data[ANSWER_MESSAGE].toArray()[0].toString().toInt() == _manager.getPlayerNumberToFindAtIndex(clientIdx)) {
         QByteArray message = _packetCreator.createJSONPacket(QList<QList<std::string>>({{INFO_MESSAGE, "You've won! The number was indeed " +
         std::to_string(_manager.getPlayerNumberToFindAtIndex(clientIdx)) + "."}, {TURN_MESSAGE, WON_MESSAGE}}));
         if (_manager.getPlayerNameAtIndex(clientIdx) != DEFAULT_CLIENT_NAME)
             std::cout << "Congrats !" << std::endl;
         pClient->sendBinaryMessage(message);
-        _manager.deletePlayerAtIndex(clientIdx);
-        _clients.removeAll(pClient);
-        pClient->deleteLater();
+        deletePlayer(clientIdx, pClient);
     } else
         checkDistance(data, pClient, clientIdx);
 }
 
 void GuessGame::Server::checkDistance(const QJsonObject &data, QWebSocket *pClient, unsigned int clientIdx)
 {
+    unsigned int triesLeft = _manager.getPlayerTriesLeftAtIndex(clientIdx);
+
+    _manager.subTriesOfPlayerAtIndex(clientIdx);
     if (data[ANSWER_MESSAGE].toArray()[0].toString().toInt() > _manager.getPlayerNumberToFindAtIndex(clientIdx)) {
-        QByteArray message = _packetCreator.createJSONPacket(QList<QList<std::string>>({{INFO_MESSAGE, "Less !"}, {TURN_MESSAGE, "yes"}}));
+        QByteArray message = _packetCreator.createJSONPacket(QList<QList<std::string>>(
+        {{INFO_MESSAGE, "Less ! (" + std::to_string(triesLeft) + " tries left.)"}, {TURN_MESSAGE, "yes"}}));
         pClient->sendBinaryMessage(message);
     } else if (data[ANSWER_MESSAGE].toArray()[0].toString().toInt() < _manager.getPlayerNumberToFindAtIndex(clientIdx)) {
-        QByteArray message = _packetCreator.createJSONPacket(QList<QList<std::string>>({{INFO_MESSAGE, "More !"}, {TURN_MESSAGE, "yes"}}));
+        QByteArray message = _packetCreator.createJSONPacket(QList<QList<std::string>>(
+        {{INFO_MESSAGE, "More ! (" + std::to_string(triesLeft) + " tries left.)"}, {TURN_MESSAGE, "yes"}}));
         pClient->sendBinaryMessage(message);
     }
-    _manager.subTriesOfPlayerAtIndex(clientIdx);
 }
-//    QByteArray message = _packetCreator.createJSONPacket(QList<QList<std::string>>({{INFO_MESSAGE, "It is your turn, you have" +
-//    (_limit ? std::to_string(_limit) + " tries left." : " unlimited tries.")}, {TURN_MESSAGE, "yes"}}));
-//    pClient->sendBinaryMessage(message);
+
+void GuessGame::Server::deletePlayer(unsigned int clientIdx, QWebSocket *pClient)
+{
+    _manager.deletePlayerAtIndex(clientIdx);
+    _clients.removeAll(pClient);
+    pClient->deleteLater();
+}
