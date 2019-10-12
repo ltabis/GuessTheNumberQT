@@ -14,8 +14,7 @@
 #define NAME_MESSAGE        "name"
 #define CONFIRM_CONNECTION  "Connection"
 #define INFO_MESSAGE        "info"
-#define WON_MESSAGE         "won"
-#define LOST_MESSAGE        "lost"
+#define END_MESSAGE         "end"
 
 namespace GuessGame {
     namespace Data {

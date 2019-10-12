@@ -90,7 +90,7 @@ void GuessGame::Client::onBinaryMessageReceived(const QByteArray &message)
         return;
     else
         std::cout << json[INFO_MESSAGE].toString().toStdString() << std::endl;
-    if (json[TURN_MESSAGE].toArray()[0].toString().toStdString() == WON_MESSAGE) {
+    if (json[TURN_MESSAGE].toArray()[0].toString().toStdString() == END_MESSAGE) {
         _webSocket.close();
         return;
     }
