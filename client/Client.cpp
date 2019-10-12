@@ -15,6 +15,8 @@ _ip(DEFAULT_IP),
 _name(DEFAULT_NAME)
 {
     setupClientApp(app);
+    std::string urlString("ws://" + _ip + ":" + _port);
+    _url = QUrl(urlString.c_str());
     if (_debug)
         qDebug() << "[Client] WebSocket server:" << _url;
     connect(&_webSocket, &QWebSocket::connected, this, &Client::onConnected);
@@ -50,20 +52,20 @@ void GuessGame::Client::assignParametersToClient()
 {
     bool debug = _appParser.isSet("debug");
     bool autoVal = _appParser.isSet("auto");
-    int port = _appParser.value("port").toInt();
+    std::string port = _appParser.value("port").toStdString();
     std::string name = _appParser.value("name").toStdString();
     std::string host = _appParser.value("host").toStdString();
 
     _debug = debug ? debug : _debug;
     _auto = autoVal ? autoVal : _auto;
-    _port = port ? port : _port;
+    _port = !port.empty() ? port : _port;
     _name = !name.empty() ? name : _name;
     _ip = !host.empty() ? host : _ip;
     if (_debug) {
         qDebug() << "[Server] Server options parsed.";
         qDebug() << "[Server] debug activated.";
         qDebug() << "[Server] auto mode : [" << (_auto ? "on" : "off") << "]";
-        qDebug() << "[Server] port : [" << _port << "]";
+        qDebug() << "[Server] port : [" << _port.c_str() << "]";
         qDebug() << "[Server] Player name : [" << _name.c_str() << "]";
         qDebug() << "[Server] host : [" << _ip.c_str() << "]";
     }

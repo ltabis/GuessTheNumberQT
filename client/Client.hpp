@@ -6,7 +6,7 @@
 
 #define DEFAULT_DEBUG   false
 #define DEFAULT_AUTO    false
-#define DEFAULT_PORT    4242
+#define DEFAULT_PORT    "4242"
 #define DEFAULT_IP      "127.0.0.1"
 #define DEFAULT_NAME    "Unknown"
 
@@ -37,7 +37,7 @@ namespace GuessGame {
 
         bool _debug;
         bool _auto;
-        int _port;
+        std::string _port;
         std::string _name;
         std::string _ip;
     };
