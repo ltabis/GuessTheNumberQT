@@ -33,7 +33,6 @@
 
 .idea/
 cmake-build-debug/
-server
 build
 subject
 client_qt
