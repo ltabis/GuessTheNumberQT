@@ -10,7 +10,9 @@ namespace GuessGame {
     namespace Data {
         class JSONPacket {
         public:
+            QJsonObject createJSONPacket(const QList<QList<std::string>> &object) const;
         private:
+            QJsonObject _json;
         };
     }
 }

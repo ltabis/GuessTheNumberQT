@@ -27,6 +27,7 @@ find_package(Qt5 REQUIRED COMPONENTS Core Network WebSockets REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS}
                     client
                     server
+                    src/JSON
                     src/exception
                     src/interfaces)
 

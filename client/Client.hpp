@@ -15,6 +15,8 @@
 #include <QtCore>
 #include <QtWebSockets/QWebSocket>
 
+#include "JSONPacket.hpp"
+
 namespace GuessGame {
     class Client : public QObject {
     Q_OBJECT

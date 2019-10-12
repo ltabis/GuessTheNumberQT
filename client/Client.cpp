@@ -82,7 +82,10 @@ void GuessGame::Client::onConnected()
 
 void GuessGame::Client::onTextMessageReceived(QString message)
 {
+    GuessGame::Data::JSONPacket packet;
     if (_debug)
         qDebug() << "[Client] Message received." << message;
+    QJsonObject a = packet.createJSONPacket({{"key1", "value1"}, {"key2", "Value1", "Value2"}, {"key3", "tg"}});
+    qDebug() << a;
     std::cout << "Server says : " << message.toStdString() << std::endl;
 }
