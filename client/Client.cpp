@@ -39,11 +39,7 @@ void GuessGame::Client::setupClientApp(QCoreApplication &app)
     QCommandLineOption autoOption({"a", "auto"}, {"Solve the game automatically."});
     QCommandLineOption nameOption({"n", "name"}, {"Client identity."}, {"name"});
 
-    _appParser.addOption(dbgOption);
-    _appParser.addOption(hostOption);
-    _appParser.addOption(portOption);
-    _appParser.addOption(autoOption);
-    _appParser.addOption(nameOption);
+    _appParser.addOptions(QList<QCommandLineOption>{dbgOption, hostOption, portOption, autoOption, nameOption});
     _appParser.process(app);
     assignParametersToClient();
 }
