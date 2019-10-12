@@ -112,7 +112,10 @@ void GuessGame::Server::onNewConnection()
     connect(pSocket, &QWebSocket::binaryMessageReceived, this, &Server::processBinaryMessage);
     connect(pSocket, &QWebSocket::disconnected, this, &Server::socketDisconnected);
     _clients << pSocket;
-    QByteArray obj = _packetCreator.createJSONPacket(QList<QList<std::string>>({{CONFIRM_CONNECTION, "Ok"}, {TURN_MESSAGE, "no"}}));
+    QByteArray obj = _packetCreator.createJSONPacket(
+    QList<QList<std::string>>({{CONFIRM_CONNECTION, "Ok"},
+                                    {TURN_MESSAGE, "no"},
+                                    {BOUND_MESSAGE, std::to_string(_bounds.first), std::to_string(_bounds.second)}}));
     if (_debug) {
         qDebug() << "[Server] A new client as just connected !";
         qDebug() << "[Server] sending confirmed connection.";
@@ -143,11 +146,11 @@ void GuessGame::Server::handleClients(const std::string &name, QWebSocket *pClie
 {
     std::seed_seq seed{std::chrono::system_clock::now().time_since_epoch().count()};
     QRandomGenerator generator(seed);
-    unsigned int test = generator.bounded(_bounds.first, _bounds.second);
+    unsigned int nbrToFind = generator.bounded(_bounds.first, _bounds.second);
 
     if (_debug)
-        qDebug() << "[Server] number to find : " << test;
-    _manager.addPlayer(name, _clients.indexOf(pClient), test, _limit);
+        qDebug() << "[Server] number to find : " << nbrToFind;
+    _manager.addPlayer(name, _clients.indexOf(pClient), nbrToFind, _limit);
 }
 
 void GuessGame::Server::handleGames(const QJsonObject &data, QWebSocket *pClient, bool startOfGame)

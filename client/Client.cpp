@@ -85,7 +85,6 @@ void GuessGame::Client::onBinaryMessageReceived(const QByteArray &message)
     QString answer;
     std::string tmp;
 
-
     if (checkIdentification(json) || json[TURN_MESSAGE].toArray()[0].toString().toStdString() == "no")
         return;
     else
@@ -95,8 +94,13 @@ void GuessGame::Client::onBinaryMessageReceived(const QByteArray &message)
         return;
     }
     while (!answer.toInt()) {
-        std::cout << "Please input your number : ";
-        std::cin >> tmp;
+        if (_auto) {
+            std::cout << "Auto mode running ..." << std::endl;
+            tmp = std::to_string(generateRandomAnswer());
+        } else {
+            std::cout << "Please input your number : ";
+            std::cin >> tmp;
+        }
         answer = tmp.c_str();
     }
     _webSocket.sendBinaryMessage(_packetCreator.createJSONPacket(QList<QList<std::string>>({{NAME_MESSAGE, _name}, {ANSWER_MESSAGE, answer.toStdString()}})));
@@ -105,6 +109,8 @@ void GuessGame::Client::onBinaryMessageReceived(const QByteArray &message)
 bool GuessGame::Client::checkIdentification(QJsonObject &json)
 {
     if (json[CONFIRM_CONNECTION].toArray()[0].toString() == "Ok") {
+        _bounds.first = json[BOUND_MESSAGE].toArray()[0].toString().toInt();
+        _bounds.second = json[BOUND_MESSAGE].toArray()[1].toString().toInt();
         QByteArray message = _packetCreator.createJSONIdentificationPacket(_name);
         if (_debug)
             qDebug() << "[Client] Message received." << json[CONFIRM_CONNECTION].toArray()[0].toString();
@@ -117,4 +123,12 @@ bool GuessGame::Client::checkIdentification(QJsonObject &json)
         std::cout << "Server says : " << json[INFO_MESSAGE].toArray()[0].toString().toStdString() << std::endl;
     }
     return false;
+}
+
+unsigned int GuessGame::Client::generateRandomAnswer()
+{
+    std::seed_seq seed{std::chrono::system_clock::now().time_since_epoch().count()};
+    QRandomGenerator generator(seed);
+
+    return generator.bounded(_bounds.first, _bounds.second);
 }

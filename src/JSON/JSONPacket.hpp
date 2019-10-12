@@ -15,6 +15,7 @@
 #define CONFIRM_CONNECTION  "Connection"
 #define INFO_MESSAGE        "info"
 #define END_MESSAGE         "end"
+#define BOUND_MESSAGE       "bounds"
 
 namespace GuessGame {
     namespace Data {
