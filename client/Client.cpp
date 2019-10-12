@@ -77,11 +77,12 @@ void GuessGame::Client::onConnected()
         qDebug() << "[Client] WebSocket connected";
     connect(&_webSocket, &QWebSocket::textMessageReceived,
             this, &Client::onTextMessageReceived);
-    _webSocket.sendTextMessage(QStringLiteral("connexion")); // A mettre en JSON
+//    _webSocket.sendTextMessage(QStringLiteral("")); // A mettre en JSON
 }
 
 void GuessGame::Client::onTextMessageReceived(QString message)
 {
     if (_debug)
-        qDebug() << "[Client] Message received:" << message;
+        qDebug() << "[Client] Message received." << message;
+    std::cout << "Server says : " << message.toStdString() << std::endl;
 }

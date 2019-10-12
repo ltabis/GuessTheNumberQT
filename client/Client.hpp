@@ -10,7 +10,7 @@
 #define DEFAULT_IP      "127.0.0.1"
 #define DEFAULT_NAME    "Unknown"
 
-// QUrl(QStringLiteral("ws://localhost:4242")
+#include <iostream>
 
 #include <QtCore>
 #include <QtWebSockets/QWebSocket>

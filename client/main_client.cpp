@@ -4,7 +4,6 @@
 
 #include "Client.hpp"
 #include "Exception.hpp"
-#include <QApplication>
 
 int main(int ac, char **av)
 {
