@@ -50,7 +50,7 @@ void GuessGame::Client::assignParametersToClient()
 {
     bool debug = _appParser.isSet("debug");
     bool autoVal = _appParser.isSet("auto");
-    int port = _appParser.value("host").toInt();
+    int port = _appParser.value("port").toInt();
     std::string name = _appParser.value("name").toStdString();
     std::string host = _appParser.value("host").toStdString();
 
