@@ -202,14 +202,17 @@ void GuessGame::Server::checkIfWin(const QJsonObject &data, QWebSocket *pClient)
 void GuessGame::Server::checkDistance(const QJsonObject &data, QWebSocket *pClient, unsigned int clientIdx)
 {
     unsigned int triesLeft = _manager.getPlayerTriesLeftAtIndex(clientIdx);
+    bool isInfinite = _manager.getPlayerInfiniteAtIndex(clientIdx);
 
     if (data[ANSWER_MESSAGE].toArray()[0].toString().toInt() > _manager.getPlayerNumberToFindAtIndex(clientIdx)) {
         QByteArray message = _packetCreator.createJSONPacket(QList<QList<std::string>>(
-        {{INFO_MESSAGE, "Less ! (" + std::to_string(triesLeft - 1) + " tries left.)"}, {TURN_MESSAGE, "yes"}}));
+        {{INFO_MESSAGE, "Less " +
+        (isInfinite ? "!" : "! (" + std::to_string(triesLeft - 1) + " tries left.)")}, {TURN_MESSAGE, "yes"}}));
         pClient->sendBinaryMessage(message);
     } else if (data[ANSWER_MESSAGE].toArray()[0].toString().toInt() < _manager.getPlayerNumberToFindAtIndex(clientIdx)) {
         QByteArray message = _packetCreator.createJSONPacket(QList<QList<std::string>>(
-        {{INFO_MESSAGE, "More ! (" + std::to_string(triesLeft - 1) + " tries left.)"}, {TURN_MESSAGE, "yes"}}));
+        {{INFO_MESSAGE, "More " +
+        (isInfinite ? "!" : "! (" + std::to_string(triesLeft - 1) + " tries left.)")}, {TURN_MESSAGE, "yes"}}));
         pClient->sendBinaryMessage(message);
     }
     _manager.subTriesOfPlayerAtIndex(clientIdx);
@@ -222,7 +225,8 @@ void GuessGame::Server::deletePlayer(unsigned int clientIdx, QWebSocket *pClient
                                           _manager.getPlayerTriesLeftAtIndex(clientIdx),
                                           status,
                                           _bounds,
-                                          _manager.getPlayerDateAtIndex(clientIdx));
+                                          _manager.getPlayerDateAtIndex(clientIdx),
+                                          _manager.getPlayerInfiniteAtIndex(clientIdx));
         _playersConfig.push_back(playerConfig);
     }
     _packetCreator.writeJSONToFile(DEFAULT_CONFIG_FILE, _playersConfig);

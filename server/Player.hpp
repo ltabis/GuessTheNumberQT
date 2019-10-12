@@ -26,6 +26,7 @@ namespace GuessGame {
         unsigned int getTriesLeft() const { return _triesLeft; };
         unsigned int getNumberToFind() const { return _numberToFind; };
         QDate getDate() const { return _startDate; };
+        bool isInfinite() const { return _infinite; };
     private:
         bool _infinite;
         std::string _name;
@@ -42,6 +43,7 @@ namespace GuessGame {
         unsigned int getPlayerNumberToFindAtIndex(unsigned int index) const { return _players.at(index).getNumberToFind(); }
         unsigned int getPlayerTriesLeftAtIndex(unsigned int index) const { return _players.at(index).getTriesLeft(); }
         std::string getPlayerNameAtIndex(unsigned int index) const { return _players.at(index).getName(); }
+        bool getPlayerInfiniteAtIndex(unsigned int index) const { return _players.at(index).isInfinite(); }
         QDate getPlayerDateAtIndex(unsigned int index) const { return _players.at(index).getDate(); }
         void subTriesOfPlayerAtIndex(unsigned int index) {_players.at(index).subTries();};
         void addPlayer(const std::string &name, unsigned int index, unsigned int nbrToFind, unsigned int limit);

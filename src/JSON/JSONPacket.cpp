@@ -48,7 +48,7 @@ QJsonArray GuessGame::Data::JSONPacket::getJSONFromFile(const std::string &name)
         return object;
     content = file.readAll();
     file.close();
-    object = QJsonDocument::fromJson(content.toUtf8())["players"].toArray();
+    object = QJsonDocument::fromJson(content.toUtf8()).array();
     return object;
 }
 
@@ -70,15 +70,24 @@ QJsonObject GuessGame::Data::JSONPacket::createPlayerConfig(
         unsigned int triesLeft,
         int status,
         std::pair<unsigned int, unsigned int> &bounds,
-        const QDate &startDate) const
+        const QDate &startDate,
+        bool unlimited) const
 {
     QDate endDate = QDate::currentDate();
     QJsonObject newSave;
+    std::vector<std::string> statuses = {"abandonned", "lost", "won"};
 
     newSave.insert("name", name.c_str());
-    newSave.insert("tries", std::to_string(triesLeft).c_str());
-    newSave.insert("score", std::to_string((bounds.second - bounds.first) / triesLeft).c_str());
+    if (!unlimited)
+        newSave.insert("remainingTries", std::to_string(bounds.second - triesLeft).c_str());
+    else
+        newSave.insert("remainingTries", "unlimited");
+    if (status != 1 && !unlimited)
+        newSave.insert("score", std::to_string((bounds.second - bounds.first) / triesLeft).c_str());
+    else
+        newSave.insert("score", "0");
     newSave.insert("startDate", startDate.toString());
     newSave.insert("endDate", endDate.toString());
+    newSave.insert("game status", statuses[status].c_str());
     return newSave;
 }
