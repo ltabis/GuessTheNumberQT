@@ -57,6 +57,8 @@ namespace GuessGame {
     private:
         void handleClients(const std::string &name, QWebSocket *pClient);
         void handleGames(const QJsonObject &data, QWebSocket *pClient, bool startOfGame = false);
+        void checkIfWin(const QJsonObject &data, QWebSocket *pClient);
+        void checkDistance(const QJsonObject &data, QWebSocket *pClient, unsigned int clientIdx);
 
         GameManager _manager;
 

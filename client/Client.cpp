@@ -86,10 +86,14 @@ void GuessGame::Client::onBinaryMessageReceived(const QByteArray &message)
     std::string tmp;
 
 
-    if (checkIdentification(json) || json[TURN_MESSAGE] == "no")
+    if (checkIdentification(json) || json[TURN_MESSAGE].toArray()[0].toString().toStdString() == "no")
         return;
     else
         std::cout << json[INFO_MESSAGE].toString().toStdString() << std::endl;
+    if (json[TURN_MESSAGE].toArray()[0].toString().toStdString() == WON_MESSAGE) {
+        _webSocket.close();
+        return;
+    }
     while (!answer.toInt()) {
         std::cout << "Please input your number : ";
         std::cin >> tmp;

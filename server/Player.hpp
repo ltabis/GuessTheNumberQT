@@ -18,16 +18,16 @@
 namespace GuessGame {
     class Player {
     public:
-        Player(const std::string &name, unsigned int numberToFind) : _name(name), _score(0), _numberToFind() {};
-        ~Player();
+        Player(const std::string &name, unsigned int numberToFind, unsigned int triesLeft);
 
-        void addScore(unsigned int score) {_score += score;};
-        std::string getName() const { return _name;};
-        unsigned int getScore() const { return _score;};
-        unsigned int getTriesLeft() const { return _triesLeft;};
+        void subTries() { _triesLeft--; };
+
+        std::string getName() const { return _name; };
+        unsigned int getTriesLeft() const { return _triesLeft; };
+        unsigned int getNumberToFind() const { return _numberToFind; };
     private:
+        bool _infinite;
         std::string _name;
-        unsigned int _score;
         unsigned int _triesLeft;
         unsigned int _numberToFind;
     };
@@ -37,9 +37,15 @@ namespace GuessGame {
         GameManager(const std::string &configFile = DEFAULT_CONFIG_FILE);
         ~GameManager();
 
-        void addPlayer(const std::string &name, unsigned int index, unsigned int nbrToFind);
+        unsigned int getPlayerNumberToFindAtIndex(unsigned int index) const { return _players.at(index).getNumberToFind(); }
+        unsigned int getPlayerTriesLeftAtIndex(unsigned int index) const { return _players.at(index).getTriesLeft(); }
+        std::string getPlayerNameAtIndex(unsigned int index) const { return _players.at(index).getName(); }
+        void subTriesOfPlayerAtIndex(unsigned int index) {_players.at(index).subTries();};
+        void addPlayer(const std::string &name, unsigned int index, unsigned int nbrToFind, unsigned int limit);
         bool isPlayerInList(const std::string &name) const;
-        unsigned int getPlayerNumber() {return _players.size();};
+        unsigned int getPlayerNumber() const {return _players.size();};
+
+        void deletePlayerAtIndex(unsigned int index);
     private:
         std::vector<Player> _players;
         std::string _configFilePath;
