@@ -25,16 +25,18 @@ namespace GuessGame {
 
         void setupClientApp(QCoreApplication &app);
         void assignParametersToClient();
+        bool checkIdentification(QJsonObject &json);
     Q_SIGNALS:
         void closed();
 
     private Q_SLOTS:
         void onConnected();
-        void onTextMessageReceived(QString message);
+        void onBinaryMessageReceived(const QByteArray &message);
 
     private:
-        QWebSocket _webSocket;
+        Data::JSONPacket _packetCreator;
         QCommandLineParser _appParser;
+        QWebSocket _webSocket;
         QUrl _url;
 
         bool _debug;

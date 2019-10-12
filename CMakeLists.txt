@@ -40,7 +40,8 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ../server/)
 add_executable(server
         ${SRC}
         server/main_server.cpp
-        server/Server.cpp)
+        server/Server.cpp
+        server/Player.cpp)
 
 ## Client
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ../client/)

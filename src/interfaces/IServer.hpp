@@ -4,6 +4,12 @@
 
 #pragma once
 
+#define DEFAULT_BOUNDX   1
+#define DEFAULT_BOUNDY   100
+#define INFINITE_LIMIT   0
+#define DEFAULT_DEBUG    false
+#define DEFAULT_PORT     4242
+
 namespace GuessGame {
 
     /// \brief

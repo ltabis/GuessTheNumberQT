@@ -62,30 +62,55 @@ void GuessGame::Client::assignParametersToClient()
     _name = !name.empty() ? name : _name;
     _ip = !host.empty() ? host : _ip;
     if (_debug) {
-        qDebug() << "[Server] Server options parsed.";
-        qDebug() << "[Server] debug activated.";
-        qDebug() << "[Server] auto mode : [" << (_auto ? "on" : "off") << "]";
-        qDebug() << "[Server] port : [" << _port.c_str() << "]";
-        qDebug() << "[Server] Player name : [" << _name.c_str() << "]";
-        qDebug() << "[Server] host : [" << _ip.c_str() << "]";
+        qDebug() << "[Client] Client options parsed.";
+        qDebug() << "[Client] debug activated.";
+        qDebug() << "[Client] auto mode : [" << (_auto ? "on" : "off") << "]";
+        qDebug() << "[Client] port : [" << _port.c_str() << "]";
+        qDebug() << "[Client] Player name : [" << _name.c_str() << "]";
+        qDebug() << "[Client] host : [" << _ip.c_str() << "]";
     }
 }
 
 void GuessGame::Client::onConnected()
 {
     if (_debug)
-        qDebug() << "[Client] WebSocket connected";
-    connect(&_webSocket, &QWebSocket::textMessageReceived,
-            this, &Client::onTextMessageReceived);
-//    _webSocket.sendTextMessage(QStringLiteral("")); // A mettre en JSON
+        qDebug() << "[Client] WebSocket connected.";
+    connect(&_webSocket, &QWebSocket::binaryMessageReceived,
+            this, &Client::onBinaryMessageReceived);
 }
 
-void GuessGame::Client::onTextMessageReceived(QString message)
+void GuessGame::Client::onBinaryMessageReceived(const QByteArray &message)
 {
-    GuessGame::Data::JSONPacket packet;
-    if (_debug)
-        qDebug() << "[Client] Message received." << message;
-    QJsonObject a = packet.createJSONPacket({{"key1", "value1"}, {"key2", "Value1", "Value2"}, {"key3", "tg"}});
-    qDebug() << a;
-    std::cout << "Server says : " << message.toStdString() << std::endl;
+    QJsonObject json = _packetCreator.UnpackToJson(message);
+    QString answer;
+    std::string tmp;
+
+
+    if (checkIdentification(json) || json[TURN_MESSAGE] == "no")
+        return;
+    else
+        std::cout << json[INFO_MESSAGE].toString().toStdString() << std::endl;
+    while (!answer.toInt()) {
+        std::cout << "Please input your number : ";
+        std::cin >> tmp;
+        answer = tmp.c_str();
+    }
+    _webSocket.sendBinaryMessage(_packetCreator.createJSONPacket(QList<QList<std::string>>({{NAME_MESSAGE, _name}, {ANSWER_MESSAGE, answer.toStdString()}})));
+}
+
+bool GuessGame::Client::checkIdentification(QJsonObject &json)
+{
+    if (json[CONFIRM_CONNECTION].toArray()[0].toString() == "Ok") {
+        QByteArray message = _packetCreator.createJSONIdentificationPacket(_name);
+        if (_debug)
+            qDebug() << "[Client] Message received." << json[CONFIRM_CONNECTION].toArray()[0].toString();
+        std::cout << "Server says : connection successful." << std::endl;
+        _webSocket.sendBinaryMessage(message);
+        return true;
+    } else {
+        if (_debug)
+            qDebug() << "[Client] Message received." << json[INFO_MESSAGE];
+        std::cout << "Server says : " << json[INFO_MESSAGE].toArray()[0].toString().toStdString() << std::endl;
+    }
+    return false;
 }
