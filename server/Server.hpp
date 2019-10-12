@@ -59,13 +59,14 @@ namespace GuessGame {
         void handleGames(const QJsonObject &data, QWebSocket *pClient, bool startOfGame = false);
         void checkIfWin(const QJsonObject &data, QWebSocket *pClient);
         void checkDistance(const QJsonObject &data, QWebSocket *pClient, unsigned int clientIdx);
-        void deletePlayer(unsigned int clientIdx, QWebSocket *pClient);
+        void deletePlayer(unsigned int clientIdx, QWebSocket *pClient, int status);
         GameManager _manager;
 
         QWebSocketServer *_pWebSocketServer;
         Data::JSONPacket _packetCreator;
         QCommandLineParser _appParser;
         QList<QWebSocket *> _clients;
+        QJsonArray _playersConfig;
 
         std::pair<unsigned int, unsigned int> _bounds;
         unsigned int _limit;

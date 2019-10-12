@@ -10,7 +10,8 @@ GuessGame::Player::Player(const std::string &name, unsigned int numberToFind, un
         _numberToFind(numberToFind),
         _triesLeft(triesLeft)
 {
-    _infinite = _triesLeft ? false : true;
+    _infinite = !_triesLeft;
+    _startDate = QDate::currentDate();
 };
 
 void GuessGame::GameManager::addPlayer(const std::string &name, unsigned int index, unsigned int nbrToFind, unsigned int limit)
@@ -26,21 +27,10 @@ void GuessGame::GameManager::addPlayer(const std::string &name, unsigned int ind
 GuessGame::GameManager::GameManager(const std::string &configFile)
 {
     Data::JSONPacket parser;
-    QJsonObject config = parser.getJSONFromFile(configFile);
+    QJsonArray config = parser.getJSONFromFile(configFile);
 
-    _configFilePath = config["error"] == "yes" ? DEFAULT_CONFIG_FILE : configFile;
+    _configFilePath = config.first().toObject()["error"] == "yes" ? DEFAULT_CONFIG_FILE : configFile;
 }
-
-GuessGame::GameManager::~GameManager()
-{
-    Data::JSONPacket parser;
-    QJsonObject obj;
-
-    for (auto &it : _players)
-        obj.insert({ it.getName().c_str() }, (int)it.getTriesLeft());
-    parser.writeJSONToFile(_configFilePath, obj);
-}
-
 
 bool GuessGame::GameManager::isPlayerInList(const std::string &name) const
 {

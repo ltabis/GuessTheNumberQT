@@ -15,6 +15,7 @@
 #define CONFIRM_CONNECTION  "Connection"
 #define INFO_MESSAGE        "info"
 #define END_MESSAGE         "end"
+#define BOUND_MESSAGE       "bounds"
 
 namespace GuessGame {
     namespace Data {
@@ -23,9 +24,15 @@ namespace GuessGame {
             QByteArray createJSONPacket(const QList<QList<std::string>> &object) const;
             QByteArray createJSONIdentificationPacket(const std::string &name) const;
             QJsonObject UnpackToJson(const QByteArray &packet) const;
+            QJsonObject createPlayerConfig(const std::string &name,
+                    unsigned int triesLeft,
+                    int status,
+                    std::pair<unsigned int, unsigned int> &bounds,
+                    const QDate &startDate,
+                    bool unlimited) const;
 
-            QJsonObject getJSONFromFile(const std::string &name) const;
-            void writeJSONToFile(const std::string &name, const QJsonObject &object) const;
+            QJsonArray getJSONFromFile(const std::string &name) const;
+            void writeJSONToFile(const std::string &name, const QJsonArray &object) const;
         };
     }
 }

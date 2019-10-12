@@ -34,11 +34,14 @@ namespace GuessGame {
         void onBinaryMessageReceived(const QByteArray &message);
 
     private:
+        unsigned int generateRandomAnswer();
+
         Data::JSONPacket _packetCreator;
         QCommandLineParser _appParser;
         QWebSocket _webSocket;
         QUrl _url;
 
+        std::pair<unsigned int, unsigned int> _bounds;
         bool _debug;
         bool _auto;
         std::string _port;

@@ -37,32 +37,57 @@ QJsonObject GuessGame::Data::JSONPacket::UnpackToJson(const QByteArray &packet) 
     return document.fromJson(packet).object();
 }
 
-QJsonObject GuessGame::Data::JSONPacket::getJSONFromFile(const std::string &name) const
+QJsonArray GuessGame::Data::JSONPacket::getJSONFromFile(const std::string &name) const
 {
     QString content;
     QFile file;
-    QJsonObject object;
+    QJsonArray object;
 
     file.setFileName({ name.c_str() });
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QJsonObject tmp;
-        tmp.insert("error", "yes");
-        return tmp;
-    }
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return object;
     content = file.readAll();
     file.close();
-    object = QJsonDocument::fromJson(content.toUtf8()).object();
-    object.insert("error", "none");
+    object = QJsonDocument::fromJson(content.toUtf8()).array();
     return object;
 }
 
-void GuessGame::Data::JSONPacket::writeJSONToFile(const std::string &name, const QJsonObject &object) const
+void GuessGame::Data::JSONPacket::writeJSONToFile(const std::string &name, const QJsonArray &object) const
 {
     QJsonDocument document(object);
     QFile file;
 
     file.setFileName({ name.c_str() });
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        std::cout << "Error" << std::endl;
         return;
+    }
     file.write(document.toJson());
+}
+
+QJsonObject GuessGame::Data::JSONPacket::createPlayerConfig(
+        const std::string &name,
+        unsigned int triesLeft,
+        int status,
+        std::pair<unsigned int, unsigned int> &bounds,
+        const QDate &startDate,
+        bool unlimited) const
+{
+    QDate endDate = QDate::currentDate();
+    QJsonObject newSave;
+    std::vector<std::string> statuses = {"abandonned", "lost", "won"};
+
+    newSave.insert("name", name.c_str());
+    if (!unlimited)
+        newSave.insert("remainingTries", std::to_string(bounds.second - triesLeft).c_str());
+    else
+        newSave.insert("remainingTries", "unlimited");
+    if (status != 1 && !unlimited)
+        newSave.insert("score", std::to_string((bounds.second - bounds.first) / triesLeft).c_str());
+    else
+        newSave.insert("score", "0");
+    newSave.insert("startDate", startDate.toString());
+    newSave.insert("endDate", endDate.toString());
+    newSave.insert("game status", statuses[status].c_str());
+    return newSave;
 }
