@@ -6,16 +6,67 @@
 
 #include <QtCore/QDebug>
 
-GuessGame::Client::Client(const QUrl &url, bool debug, QObject *parent) :
+GuessGame::Client::Client(QCoreApplication &app, QObject *parent) :
 QObject(parent),
-_url(url),
-_debug(debug)
+_debug(DEFAULT_DEBUG),
+_auto(DEFAULT_AUTO),
+_port(DEFAULT_PORT),
+_ip(DEFAULT_IP),
+_name(DEFAULT_NAME)
 {
+    setupClientApp(app);
     if (_debug)
-        qDebug() << "[Client] WebSocket server:" << url;
+        qDebug() << "[Client] WebSocket server:" << _url;
     connect(&_webSocket, &QWebSocket::connected, this, &Client::onConnected);
     connect(&_webSocket, &QWebSocket::disconnected, this, &Client::closed);
-    _webSocket.open(QUrl(url));
+    _webSocket.open(QUrl(_url));
+}
+
+/*
+ * Setup all the parameters passed in the app
+ */
+void GuessGame::Client::setupClientApp(QCoreApplication &app)
+{
+    QCoreApplication::setApplicationName("GuessTheNumberClient");
+    QCoreApplication::setApplicationVersion("1.0");
+    _appParser.setApplicationDescription({"Client program for the GuessTheNumber game."});
+    _appParser.addVersionOption();
+    QCommandLineOption dbgOption({"d", "debug"}, {"Debug output [default: off]."});
+    QCommandLineOption hostOption({"h", "host"}, {"IP of the server [default: 127.0.0.1]."}, {"ip"});
+    QCommandLineOption portOption({"p", "port"}, {"Port to connect to [default: 4242]."}, {"port"});
+    QCommandLineOption autoOption({"a", "auto"}, {"Solve the game automatically."});
+    QCommandLineOption nameOption({"n", "name"}, {"Client identity."}, {"name"});
+
+    _appParser.addOption(dbgOption);
+    _appParser.addOption(hostOption);
+    _appParser.addOption(portOption);
+    _appParser.addOption(autoOption);
+    _appParser.addOption(nameOption);
+    _appParser.process(app);
+    assignParametersToClient();
+}
+
+void GuessGame::Client::assignParametersToClient()
+{
+    bool debug = _appParser.isSet("debug");
+    bool autoVal = _appParser.isSet("auto");
+    int port = _appParser.value("host").toInt();
+    std::string name = _appParser.value("name").toStdString();
+    std::string host = _appParser.value("host").toStdString();
+
+    _debug = debug ? debug : _debug;
+    _auto = autoVal ? autoVal : _auto;
+    _port = port ? port : _port;
+    _name = !name.empty() ? name : _name;
+    _ip = !host.empty() ? host : _ip;
+    if (_debug) {
+        qDebug() << "[Server] Server options parsed.";
+        qDebug() << "[Server] debug activated.";
+        qDebug() << "[Server] auto mode : [" << (_auto ? "on" : "off") << "]";
+        qDebug() << "[Server] port : [" << _port << "]";
+        qDebug() << "[Server] Player name : [" << _name.c_str() << "]";
+        qDebug() << "[Server] host : [" << _ip.c_str() << "]";
+    }
 }
 
 void GuessGame::Client::onConnected()

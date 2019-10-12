@@ -6,27 +6,13 @@
 #include "Exception.hpp"
 #include <QApplication>
 
-int main(int argc, char **argv)
+int main(int ac, char **av)
 {
-    QCoreApplication a(argc, argv);
-
-    QCommandLineParser parser;
-    parser.setApplicationDescription("GuessTheNumber Client");
-    parser.addHelpOption();
-    parser.addVersionOption();
-
-    QCommandLineOption dbgOption(QStringList() << "d" << "debug",{"Debug output [default: off]."});
-
-    parser.addOption(dbgOption);
-    parser.process(a);
-
-    bool debug = parser.isSet(dbgOption);
+    QCoreApplication app(ac, av);
 
     try {
-        // hardcoded, to change
-        GuessGame::Client client(QUrl(QStringLiteral("ws://localhost:4242")), debug);
-        QObject::connect(&client, &GuessGame::Client::closed, &a, &QCoreApplication::quit);
-        QCoreApplication app(argc, argv);
+        GuessGame::Client client(app);
+        QObject::connect(&client, &GuessGame::Client::closed, &app, &QCoreApplication::quit);
 
         return app.exec();
     } catch (Log::Exception &exception) {
