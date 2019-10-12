@@ -138,7 +138,11 @@ void GuessGame::Server::processBinaryMessage(const QByteArray &message)
 
 void GuessGame::Server::handleClients(const std::string &name, QWebSocket *pClient)
 {
-    _manager.addPlayer(name, _clients.indexOf(pClient));
+    std::seed_seq seed{std::chrono::system_clock::now().time_since_epoch().count()};
+    QRandomGenerator generator(seed);
+
+    std::cout << generator.bounded(_bounds.first, _bounds.second) << std::endl;
+    _manager.addPlayer(name, _clients.indexOf(pClient), generator.bounded(_bounds.first, _bounds.second));
 }
 
 void GuessGame::Server::handleGames(const QJsonObject &data, QWebSocket *pClient, bool startOfGame)

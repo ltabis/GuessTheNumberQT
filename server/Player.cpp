@@ -10,14 +10,14 @@ GuessGame::Player::~Player()
 
 }
 
-void GuessGame::GameManager::addPlayer(const std::string &name, unsigned int index)
+void GuessGame::GameManager::addPlayer(const std::string &name, unsigned int index, unsigned int nbrToFind)
 {
     if (index < _players.size() && _players.at(index).getName() == DEFAULT_CLIENT_NAME)
         return;
     for (auto &it : _players)
         if (it.getName() == name && name != DEFAULT_CLIENT_NAME)
             return;
-    _players.emplace_back(Player(name));
+    _players.emplace_back(Player(name, nbrToFind));
 }
 
 GuessGame::GameManager::GameManager(const std::string &configFile)
