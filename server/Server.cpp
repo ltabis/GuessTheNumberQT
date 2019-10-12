@@ -165,13 +165,12 @@ void GuessGame::Server::handleGames(const QJsonObject &data, QWebSocket *pClient
 void GuessGame::Server::socketDisconnected()
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
+    unsigned int clientIdx = _clients.indexOf(pClient);
 
     if (_debug)
         qDebug() << "[Server] socket disconnected :" << pClient;
-    if (pClient) {
-        _clients.removeAll(pClient);
-        pClient->deleteLater();
-    }
+    if (pClient)
+        deletePlayer(clientIdx, pClient);
 }
 
 void GuessGame::Server::checkIfWin(const QJsonObject &data, QWebSocket *pClient)
