@@ -25,6 +25,7 @@ _app(ac, av)
         }
         connect(_pWebSocketServer, &QWebSocketServer::newConnection,this, &Server::onNewConnection);
         connect(_pWebSocketServer, &QWebSocketServer::closed, this, &Server::closed);
+        QObject::connect(this, &GuessGame::Server::closed, &_app, &QCoreApplication::quit);
     } else
         throw Log::Exception("Server web socket hasn't been initialised properly", "Server constructor");
 }
@@ -138,6 +139,7 @@ void GuessGame::Server::processBinaryMessage(const QByteArray &message)
         qDebug() << "[Server] Binary Message received :" << message;
     for (auto &it : packet.keys())
         if (it.toStdString() == CONNEXION_REQUEST) {
+            std::cout << "PASSED" << std::endl;
             handleClients(packet[CONNEXION_REQUEST].toString().toStdString(), pClient);
             startOfGame = true;
         }

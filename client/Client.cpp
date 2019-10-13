@@ -6,21 +6,23 @@
 
 #include <QtCore/QDebug>
 
-GuessGame::Client::Client(QCoreApplication &app, QObject *parent) :
+GuessGame::Client::Client(int ac, char *av[], QObject *parent) :
 QObject(parent),
 _debug(DEFAULT_DEBUG),
 _auto(DEFAULT_AUTO),
 _port(DEFAULT_PORT),
 _ip(DEFAULT_IP),
-_name(DEFAULT_NAME)
+_name(DEFAULT_NAME),
+_app(ac, av)
 {
-    setupClientApp(app);
+    setupClientApp(_app);
     std::string urlString("ws://" + _ip + ":" + _port);
     _url = QUrl(urlString.c_str());
     if (_debug)
         qDebug() << "[Client] WebSocket server:" << _url;
     connect(&_webSocket, &QWebSocket::connected, this, &Client::onConnected);
     connect(&_webSocket, &QWebSocket::disconnected, this, &Client::closed);
+    QObject::connect(this, &GuessGame::Client::closed, &_app, &QCoreApplication::quit);
     _webSocket.open(QUrl(_url));
 }
 

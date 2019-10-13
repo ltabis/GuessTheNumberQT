@@ -21,13 +21,15 @@ namespace GuessGame {
     class Client : public QObject {
     Q_OBJECT
     public:
-        explicit Client(QCoreApplication &app, QObject *parent = nullptr);
+        explicit Client(int ac, char *av[], QObject *parent = nullptr);
 
         void setupClientApp(QCoreApplication &app);
         void assignParametersToClient();
         bool checkIdentification(QJsonObject &json);
+        int run() { return _app.exec();};
     Q_SIGNALS:
         void closed();
+
 
     private Q_SLOTS:
         void onConnected();
@@ -39,6 +41,7 @@ namespace GuessGame {
         Data::JSONPacket _packetCreator;
         QCommandLineParser _appParser;
         QWebSocket _webSocket;
+        QCoreApplication _app;
         QUrl _url;
 
         std::pair<unsigned int, unsigned int> _bounds;

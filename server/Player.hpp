@@ -19,6 +19,7 @@ namespace GuessGame {
     class Player {
     public:
         Player(const std::string &name, unsigned int numberToFind, unsigned int triesLeft);
+        ~Player() = default;
 
         void subTries() { _triesLeft--; };
 
@@ -40,19 +41,19 @@ namespace GuessGame {
         GameManager(const std::string &configFile = DEFAULT_CONFIG_FILE);
         ~GameManager() = default;
 
-        unsigned int getPlayerNumberToFindAtIndex(unsigned int index) const { return _players.at(index).getNumberToFind(); }
-        unsigned int getPlayerTriesLeftAtIndex(unsigned int index) const { return _players.at(index).getTriesLeft(); }
-        std::string getPlayerNameAtIndex(unsigned int index) const { return _players.at(index).getName(); }
-        bool getPlayerInfiniteAtIndex(unsigned int index) const { return _players.at(index).isInfinite(); }
-        QDate getPlayerDateAtIndex(unsigned int index) const { return _players.at(index).getDate(); }
-        void subTriesOfPlayerAtIndex(unsigned int index) {_players.at(index).subTries();};
+        unsigned int getPlayerNumberToFindAtIndex(unsigned int index) const { return _players[index].getNumberToFind(); }
+        unsigned int getPlayerTriesLeftAtIndex(unsigned int index) const { return _players[index].getTriesLeft(); }
+        std::string getPlayerNameAtIndex(unsigned int index) const { return _players[index].getName(); }
+        bool getPlayerInfiniteAtIndex(unsigned int index) const { return _players[index].isInfinite(); }
+        QDate getPlayerDateAtIndex(unsigned int index) const { return _players[index].getDate(); }
+        void subTriesOfPlayerAtIndex(unsigned int index) {_players[index].subTries();};
         void addPlayer(const std::string &name, unsigned int index, unsigned int nbrToFind, unsigned int limit);
         bool isPlayerInList(const std::string &name) const;
         unsigned int getPlayerNumber() const {return _players.size();};
 
         void deletePlayerAtIndex(unsigned int index);
     private:
-        std::vector<Player> _players;
+        QList<Player> _players;
         std::string _configFilePath;
     };
 }

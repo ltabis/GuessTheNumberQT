@@ -7,13 +7,11 @@
 
 int main(int ac, char **av)
 {
-    QCoreApplication app(ac, av);
 
     try {
-        GuessGame::Client client(app);
-        QObject::connect(&client, &GuessGame::Client::closed, &app, &QCoreApplication::quit);
+        GuessGame::Client client(ac, av);
 
-        return app.exec();
+        return client.run();
     } catch (Log::Exception &exception) {
         exception.debugErrorMessage();
     }
