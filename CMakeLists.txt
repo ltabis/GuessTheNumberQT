@@ -13,8 +13,8 @@ endif()
 
 ## Getting Google test library
 set(CMAKE_PREFIX_PATH /usr/lib/x86_64-linux-gnu/qt5)
-enable_testing()
-find_package(GTest REQUIRED)
+# enable_testing()
+# find_package(GTest REQUIRED)
 
 # Qt5
 set(CMAKE_AUTOUIC ON)
@@ -24,8 +24,7 @@ set(CMAKE_PREFIX_PATH $ENV{HOME}/Qt5.13.1/5.13.1/gcc_64)
 find_package(Qt5 REQUIRED COMPONENTS Core Network WebSockets REQUIRED)
 
 #including hpp files
-include_directories(${GTEST_INCLUDE_DIRS}
-                    client
+include_directories(client
                     server
                     src/JSON
                     src/exception
@@ -51,17 +50,17 @@ add_executable(client
         client/Client.cpp)
 
 ## Tests
-set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ../tests)
-add_executable(unit_tests
-        ${SRC}
-        tests/other/test_exception.cpp)
+# set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ../tests)
+# add_executable(unit_tests
+#         ${SRC}
+#         tests/other/test_exception.cpp)
 
 ## Library linking
-target_link_libraries(unit_tests PUBLIC
-        ${GTEST_LIBRARIES} pthread
-        Qt5::Core
-        Qt5::Network
-        Qt5::WebSockets)
+# target_link_libraries(unit_tests PUBLIC
+#         ${GTEST_LIBRARIES} pthread
+#         Qt5::Core
+#         Qt5::Network
+#         Qt5::WebSockets)
 target_link_libraries(server PUBLIC
         Qt5::Core
         Qt5::Network
