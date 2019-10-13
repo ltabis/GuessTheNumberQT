@@ -60,6 +60,7 @@ namespace GuessGame {
         void checkIfWin(const QJsonObject &data, QWebSocket *pClient);
         void checkDistance(const QJsonObject &data, QWebSocket *pClient, unsigned int clientIdx);
         void deletePlayer(unsigned int clientIdx, QWebSocket *pClient, int status);
+        void displayPlayerScore(unsigned int clientIdx, QWebSocket *pClient);
         GameManager _manager;
 
         QWebSocketServer *_pWebSocketServer;

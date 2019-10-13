@@ -29,7 +29,7 @@ namespace GuessGame {
                     int status,
                     std::pair<unsigned int, unsigned int> &bounds,
                     const QDate &startDate,
-                    bool unlimited) const;
+                    unsigned int unlimited) const;
 
             QJsonArray getJSONFromFile(const std::string &name) const;
             void writeJSONToFile(const std::string &name, const QJsonArray &object) const;
