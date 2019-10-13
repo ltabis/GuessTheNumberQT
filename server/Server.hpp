@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <map>
 #include <chrono>
 #include <utility>
 #include <iostream>
@@ -59,8 +60,9 @@ namespace GuessGame {
         void handleGames(const QJsonObject &data, QWebSocket *pClient, bool startOfGame = false);
         void checkIfWin(const QJsonObject &data, QWebSocket *pClient);
         void checkDistance(const QJsonObject &data, QWebSocket *pClient, unsigned int clientIdx);
-        void deletePlayer(unsigned int clientIdx, QWebSocket *pClient, int status);
+        void deletePlayer(unsigned int clientIdx, QWebSocket *pClient);
         void displayPlayerScore(unsigned int clientIdx, QWebSocket *pClient);
+        void writePlayerScoreInConfigFile(unsigned int clientIdx, int status);
         GameManager _manager;
 
         QWebSocketServer *_pWebSocketServer;
