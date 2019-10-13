@@ -15,7 +15,16 @@
 #define CONFIRM_CONNECTION  "Connection"
 #define INFO_MESSAGE        "info"
 #define END_MESSAGE         "end"
+#define WIN_MESSAGE         "won"
 #define BOUND_MESSAGE       "bounds"
+#define TRIES               "tries"
+#define SERVER_TRIES        "server tries"
+#define GAME_STATUS         "game status"
+#define SCORE               "score"
+#define NEGATIVE_RESPONSE   "no"
+#define POSITIVE_RESPONSE   "yes"
+#define START_DATE          "start date"
+#define END_DATE          "end date"
 
 namespace GuessGame {
     namespace Data {

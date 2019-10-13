@@ -78,17 +78,18 @@ QJsonObject GuessGame::Data::JSONPacket::createPlayerConfig(
     std::vector<std::string> statuses = {"abandonned", "lost", "won"};
     unsigned int interval = bounds.second - bounds.first;
 
-    newSave.insert("name", name.c_str());
+    newSave.insert(NAME_MESSAGE, name.c_str());
     if (unlimited)
-        newSave.insert("tries", std::to_string(unlimited - triesLeft).c_str());
+        newSave.insert(TRIES, std::to_string(unlimited - triesLeft).c_str());
     else
-        newSave.insert("tries", "unlimited");
+        newSave.insert(TRIES, "unlimited");
     if (status != 1 && unlimited)
-        newSave.insert("score", std::to_string(interval * triesLeft).c_str());
+        newSave.insert(SCORE, std::to_string(interval * triesLeft).c_str());
     else
-        newSave.insert("score", "0");
-    newSave.insert("startDate", startDate.toString());
-    newSave.insert("endDate", endDate.toString());
-    newSave.insert("game status", statuses[status].c_str());
+        newSave.insert(SCORE, "0");
+    newSave.insert(START_DATE, startDate.toString());
+    newSave.insert(END_DATE, endDate.toString());
+    newSave.insert(GAME_STATUS, statuses[status].c_str());
+    newSave.insert(SERVER_TRIES, std::to_string(unlimited).c_str());
     return newSave;
 }

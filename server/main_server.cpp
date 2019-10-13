@@ -8,13 +8,10 @@
 
 int main(int ac, char *av[])
 {
-    QCoreApplication app(ac, av);
-
     try {
-        std::unique_ptr<GuessGame::IServer> server(new GuessGame::Server(app));
+        std::unique_ptr<GuessGame::IServer> server(new GuessGame::Server(ac, av));
 
-        server->run();
-        return app.exec();
+        return server->run();
     } catch (Log::Exception &exception) {
         exception.debugErrorMessage();
     }

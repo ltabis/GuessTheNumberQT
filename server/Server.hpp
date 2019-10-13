@@ -29,12 +29,12 @@ namespace GuessGame {
         /// \param bound_x minimum bound value
         /// \param bound_y maximum bound value
         /// \param limit limit of turn for the player
-        Server(QCoreApplication &app, QObject *parent = nullptr);
+        Server(int ac, char *av[], QObject *parent = nullptr);
         ~Server();
 
         // Inheritance methods
         /// \brief runs the server
-        void run() override;
+        int run() override;
         /// \brief stops the server
         /// \return the code that made the server stop
         int stop() override;
@@ -70,6 +70,7 @@ namespace GuessGame {
         QCommandLineParser _appParser;
         QList<QWebSocket *> _clients;
         QJsonArray _playersConfig;
+        QCoreApplication _app;
 
         std::pair<unsigned int, unsigned int> _bounds;
         unsigned int _limit;

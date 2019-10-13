@@ -8,14 +8,15 @@
 /*
  * Constructor
  */
-GuessGame::Server::Server(QCoreApplication &app, QObject *parent) :
+GuessGame::Server::Server(int ac, char *av[], QObject *parent) :
 QObject(parent),
 _pWebSocketServer(new QWebSocketServer(QStringLiteral("GuessTheNumber Server"),QWebSocketServer::NonSecureMode, this)),
 _status(IS_INACTIVE),
 _limit(INFINITE_LIMIT),
-_debug(DEFAULT_DEBUG)
+_debug(DEFAULT_DEBUG),
+_app(ac, av)
 {
-    setupServerApp(app);
+    setupServerApp(_app);
     if (_pWebSocketServer->listen(QHostAddress::Any, DEFAULT_PORT)) {
         _playersConfig = _packetCreator.getJSONFromFile(DEFAULT_CONFIG_FILE);
         if (_debug) {
@@ -40,11 +41,12 @@ GuessGame::Server::~Server()
 /*
  * Run the server
  */
-void GuessGame::Server::run()
+int GuessGame::Server::run()
 {
     if (_debug)
         qDebug() << "[Server] Server started, waiting for clients ...";
     _status = IS_RUNNING;
+    return _app.exec();
 }
 
 /*
@@ -114,7 +116,7 @@ void GuessGame::Server::onNewConnection()
     _clients << pSocket;
     QByteArray obj = _packetCreator.createJSONPacket(
     QList<QList<std::string>>({{CONFIRM_CONNECTION, "Ok"},
-                                    {TURN_MESSAGE, "no"},
+                                    {TURN_MESSAGE, NEGATIVE_RESPONSE},
                                     {BOUND_MESSAGE, std::to_string(_bounds.first), std::to_string(_bounds.second)}}));
     if (_debug) {
         qDebug() << "[Server] A new client as just connected !";
@@ -160,7 +162,7 @@ void GuessGame::Server::handleGames(const QJsonObject &data, QWebSocket *pClient
         std::to_string(_bounds.first) + " and " + std::to_string(_bounds.second) + ". It is your turn, you have " +
         (_limit ? std::to_string(_limit) + " tries left." : " unlimited tries."));
         QByteArray message = _packetCreator.createJSONPacket(
-        QList<QList<std::string>>({{INFO_MESSAGE, format}, {TURN_MESSAGE, "yes"}}));
+        QList<QList<std::string>>({{INFO_MESSAGE, format}, {TURN_MESSAGE, POSITIVE_RESPONSE}}));
         pClient->sendBinaryMessage(message);
     } else
         checkIfWin(data, pClient);
@@ -210,12 +212,12 @@ void GuessGame::Server::checkDistance(const QJsonObject &data, QWebSocket *pClie
     if (data[ANSWER_MESSAGE].toArray()[0].toString().toInt() > _manager.getPlayerNumberToFindAtIndex(clientIdx)) {
         QByteArray message = _packetCreator.createJSONPacket(QList<QList<std::string>>(
         {{INFO_MESSAGE, "Less " +
-        (isInfinite ? "!" : "! (" + std::to_string(triesLeft - 1) + " tries left.)")}, {TURN_MESSAGE, "yes"}}));
+        (isInfinite ? "!" : "! (" + std::to_string(triesLeft - 1) + " tries left.)")}, {TURN_MESSAGE, POSITIVE_RESPONSE}}));
         pClient->sendBinaryMessage(message);
     } else if (data[ANSWER_MESSAGE].toArray()[0].toString().toInt() < _manager.getPlayerNumberToFindAtIndex(clientIdx)) {
         QByteArray message = _packetCreator.createJSONPacket(QList<QList<std::string>>(
         {{INFO_MESSAGE, "More " +
-        (isInfinite ? "!" : "! (" + std::to_string(triesLeft - 1) + " tries left.)")}, {TURN_MESSAGE, "yes"}}));
+        (isInfinite ? "!" : "! (" + std::to_string(triesLeft - 1) + " tries left.)")}, {TURN_MESSAGE, POSITIVE_RESPONSE}}));
         pClient->sendBinaryMessage(message);
     }
     _manager.subTriesOfPlayerAtIndex(clientIdx);
@@ -233,20 +235,21 @@ void GuessGame::Server::displayPlayerScore(unsigned int clientIdx, QWebSocket *p
 {
     QByteArray message;
     std::string format = "Here are your best scores :\n";
-    std::map<unsigned int, unsigned int> scores;
+    std::map<unsigned int, std::pair<unsigned int, unsigned int>> scores;
     unsigned int i = 0;
 
     for (; i < _playersConfig.size(); ++i)
         if (_playersConfig[i].toObject()[NAME_MESSAGE].toString().toStdString() ==
         _manager.getPlayerNameAtIndex(clientIdx) &&
-        _playersConfig[i].toObject()["game status"].toString().toStdString() == "won")
-            scores.emplace(_playersConfig[i].toObject()["score"].toString().toInt(),
-                           _playersConfig[i].toObject()["tries"].toString().toInt());
+        _playersConfig[i].toObject()[GAME_STATUS].toString().toStdString() == WIN_MESSAGE)
+            scores.emplace(_playersConfig[i].toObject()[SCORE].toString().toInt(),
+                           std::make_pair(_playersConfig[i].toObject()[TRIES].toString().toInt(),
+                           _playersConfig[i].toObject()[SERVER_TRIES].toString().toInt()));
     i = 0;
     for (auto it = scores.rbegin(); i < 5 && i < scores.size(); ++i, it++)
         format += (std::to_string(i + 1) + " : " + std::to_string(it->first) +
-        " points in " + std::to_string(it->second) + " tries out of " +
-        (!_limit ? "an infinite amount of tries" : std::to_string(_limit))+ "\n");
+        " points in " + std::to_string(it->second.first) + " tries out of " +
+        (!it->second.second ? "an infinite amount of tries" : std::to_string(it->second.second))+ "\n");
     format = _manager.getPlayerNameAtIndex(clientIdx) == DEFAULT_CLIENT_NAME ? "" : format;
     message = _packetCreator.createJSONPacket(QList<QList<std::string>>(
     {{INFO_MESSAGE, "You've won! The number was indeed " +

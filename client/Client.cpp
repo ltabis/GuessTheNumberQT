@@ -81,7 +81,8 @@ void GuessGame::Client::onBinaryMessageReceived(const QByteArray &message)
     QString answer;
     std::string tmp;
 
-    if (checkIdentification(json) || json[TURN_MESSAGE].toArray()[0].toString().toStdString() == "no")
+    if (checkIdentification(json) ||
+    json[TURN_MESSAGE].toArray()[0].toString().toStdString() == NEGATIVE_RESPONSE)
         return;
     else
         std::cout << json[INFO_MESSAGE].toString().toStdString() << std::endl;
@@ -99,7 +100,8 @@ void GuessGame::Client::onBinaryMessageReceived(const QByteArray &message)
         }
         answer = tmp.c_str();
     }
-    _webSocket.sendBinaryMessage(_packetCreator.createJSONPacket(QList<QList<std::string>>({{NAME_MESSAGE, _name}, {ANSWER_MESSAGE, answer.toStdString()}})));
+    _webSocket.sendBinaryMessage(_packetCreator.createJSONPacket(
+    QList<QList<std::string>>({{NAME_MESSAGE, _name}, {ANSWER_MESSAGE, answer.toStdString()}})));
 }
 
 bool GuessGame::Client::checkIdentification(QJsonObject &json)

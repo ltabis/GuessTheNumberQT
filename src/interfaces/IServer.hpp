@@ -25,7 +25,7 @@ namespace GuessGame {
         virtual ~IServer() = default;
 
         /// \brief runs the server
-        virtual void run() = 0;
+        virtual int run() = 0;
         virtual int stop() = 0;
         virtual int getStatus() const = 0;
     };
